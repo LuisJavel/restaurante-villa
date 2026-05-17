@@ -1,0 +1,103 @@
+<%- include('partials/header') %>
+
+<main>
+    <section class="hero-page" style="--hero-bg: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&q=80');">
+        <div class="hero-page-overlay"></div>
+        <div class="hero-page-content">
+            <h1>Galería</h1>
+            <p>Conoce nuestros espacios y creaciones</p>
+        </div>
+    </section>
+
+    <section class="seccion">
+        <div class="galeria-grid">
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Interior del restaurante">
+                <div class="galeria-item-overlay"><span>Interior Principal</span></div>
+            </div>
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80" alt="Plato gourmet">
+                <div class="galeria-item-overlay"><span>Cocina de Autor</span></div>
+            </div>
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=80" alt="Sala principal">
+                <div class="galeria-item-overlay"><span>Sala de Comedor</span></div>
+            </div>
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80" alt="Chef">
+                <div class="galeria-item-overlay"><span>Nuestro Chef</span></div>
+            </div>
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=600&q=80" alt="Vinos">
+                <div class="galeria-item-overlay"><span>Bodega Premium</span></div>
+            </div>
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80" alt="Terraza">
+                <div class="galeria-item-overlay"><span>Terraza Exterior</span></div>
+            </div>
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=600&q=80" alt="Postres">
+                <div class="galeria-item-overlay"><span>Postres Artesanales</span></div>
+            </div>
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600&q=80" alt="Carne premium">
+                <div class="galeria-item-overlay"><span>Cortes Premium</span></div>
+            </div>
+            <div class="galeria-item">
+                <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=600&q=80" alt="Bar">
+                <div class="galeria-item-overlay"><span>Bar&Lounge</span></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+.hero-mini {
+    position: relative;
+    height: 35vh;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+}
+
+.hero-mini-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #312e81 100%);
+}
+
+.hero-mini-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80') center/cover;
+    opacity: 0.25;
+}
+
+.hero-mini-content {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+}
+
+.hero-mini-content h1 {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-mini-content p {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+}
+</style>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,678 @@
+<%- include('partials/header') %>
+
+<main>
+    <section class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1 class="admin-title">
+                    <span class="admin-title-icon">⚙️</span>
+                    Panel de Administración
+                </h1>
+                <p class="admin-subtitle">Gestiona las reservas de tu restaurante</p>
+            </div>
+            <div class="admin-actions">
+                <a href="/" class="btn-action-secondary">
+                    <span>←</span> Volver al sitio
+                </a>
+                <a href="/admin/menu" class="btn-action-secondary">
+                    <span>🍽️</span> Gestionar Menú
+                </a>
+                <a href="/admin/calendario" class="btn-action-secondary" style="background: var(--color-accent); color: white; border-color: var(--color-accent);">
+                    <span>📅</span> Calendario
+                </a>
+                <a href="/logout" class="btn-action-secondary" style="background: #fee2e2; color: #991b1b; border-color: #fee2e2;">
+                    <span>🚪</span> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card stat-total">
+                <div class="stat-emoji">📋</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalReservas"><%= reservas.length %></span>
+                    <span class="stat-label">Total Reservas</span>
+                </div>
+                <div class="stat-bar"></div>
+            </div>
+            <div class="stat-card stat-pending">
+                <div class="stat-emoji">⏳</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="reservasPendientes"><%= reservas.filter(r => r.estado === 'pendiente').length %></span>
+                    <span class="stat-label">Pendientes</span>
+                </div>
+                <div class="stat-bar"></div>
+            </div>
+            <div class="stat-card stat-confirmed">
+                <div class="stat-emoji">✅</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="reservasConfirmadas"><%= reservas.filter(r => r.estado === 'confirmada').length %></span>
+                    <span class="stat-label">Confirmadas</span>
+                </div>
+                <div class="stat-bar"></div>
+            </div>
+            <div class="stat-card stat-cancelled">
+                <div class="stat-emoji">❌</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="reservasCanceladas"><%= reservas.filter(r => r.estado === 'cancelada').length %></span>
+                    <span class="stat-label">Canceladas</span>
+                </div>
+                <div class="stat-bar"></div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">
+                    <h2>📋 Reservas</h2>
+                    <span class="table-badge"><%= reservas.length %> total</span>
+                </div>
+                <div class="table-filters">
+                    <button class="filter-btn active" data-filter="all">Todas</button>
+                    <button class="filter-btn" data-filter="pendiente">Pendientes</button>
+                    <button class="filter-btn" data-filter="confirmada">Confirmadas</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="reservations-table">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Teléfono</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Personas</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaReservas">
+                        <% if (reservas.length === 0) { %>
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <p>No hay reservas registradas</p>
+                            </td>
+                        </tr>
+                        <% } else { %>
+                        <% reservas.forEach(reserva => { %>
+                        <tr data-id="<%= reserva.id %>" data-estado="<%= reserva.estado %>">
+                            <td>
+                                <div class="client-cell">
+                                    <div class="client-avatar"><%= reserva.nombre.charAt(0) %></div>
+                                    <div class="client-info">
+                                        <span class="client-name"><%= reserva.nombre %></span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="phone-cell">📞 <%= reserva.telefono %></span>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <span class="date-day"><%= reserva.fecha.split('-')[2] %></span>
+                                    <span class="date-month"><%= reserva.fecha.split('-')[1] %>/<%= reserva.fecha.split('-')[0] %></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="time-cell">🕐 <%= reserva.hora %></span>
+                            </td>
+                            <td>
+                                <span class="people-cell"><%= reserva.personas %> 👤</span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-<%= reserva.estado %>">
+                                    <%= reserva.estado %>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn action-confirm" data-id="<%= reserva.id %>" title="Confirmar">
+                                        ✓
+                                    </button>
+                                    <button class="action-btn action-cancel" data-id="<%= reserva.id %>" title="Cancelar">
+                                        ✕
+                                    </button>
+                                    <button class="action-btn action-delete" data-id="<%= reserva.id %>" title="Eliminar">
+                                        🗑
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <% }); %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+.admin-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.admin-title {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.admin-title-icon {
+    font-size: 1.5rem;
+}
+
+.admin-subtitle {
+    color: var(--color-text-light);
+    font-size: 0.95rem;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-action-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-light);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    transition: all 0.2s;
+    background: var(--color-card);
+}
+
+.btn-action-secondary:hover {
+    background: var(--color-bg);
+    color: var(--color-primary);
+    border-color: var(--color-text-light);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--color-card);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-emoji {
+    font-size: 2.25rem;
+    line-height: 1;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    margin-top: 0.35rem;
+}
+
+.stat-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.stat-total .stat-bar { background: linear-gradient(90deg, var(--color-accent), #a78bfa); }
+.stat-pending .stat-bar { background: linear-gradient(90deg, var(--color-warning), #fbbf24); }
+.stat-confirmed .stat-bar { background: linear-gradient(90deg, var(--color-success), #4ade80); }
+.stat-cancelled .stat-bar { background: linear-gradient(90deg, var(--color-danger), #f87171); }
+
+.table-card {
+    background: var(--color-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+}
+
+.table-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.table-title h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.table-badge {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    background: var(--color-bg);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+}
+
+.table-filters {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    background: var(--color-bg);
+    color: var(--color-primary);
+}
+
+.filter-btn.active {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.reservations-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.reservations-table th {
+    text-align: left;
+    padding: 1rem 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-light);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.reservations-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+.reservations-table tbody tr {
+    transition: background 0.2s;
+}
+
+.reservations-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.reservations-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.client-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.client-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--color-accent), #a78bfa);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.client-name {
+    font-weight: 500;
+    color: var(--color-primary);
+}
+
+.phone-cell, .time-cell {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+
+.date-cell {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.date-day {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.date-month {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+}
+
+.people-cell {
+    font-size: 0.95rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.status-pendiente {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-confirmada {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-cancelada {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.action-confirm {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.action-confirm:hover {
+    background: #22c55e;
+    color: white;
+    transform: scale(1.1);
+}
+
+.action-cancel {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.action-cancel:hover {
+    background: #ef4444;
+    color: white;
+    transform: scale(1.1);
+}
+
+.action-delete {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.action-delete:hover {
+    background: #ef4444;
+    color: white;
+    transform: scale(1.1);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem !important;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: var(--color-text-light);
+    font-size: 1.1rem;
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .admin-actions {
+        width: 100%;
+    }
+
+    .btn-action-secondary {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .table-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .table-filters {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+
+    .admin-container {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const rows = () => document.querySelectorAll('#tablaReservas tr[data-id]');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filter = btn.dataset.filter;
+
+            rows().forEach(row => {
+                if (filter === 'all' || row.dataset.estado === filter) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    async function actualizarReservas() {
+        try {
+            const response = await fetch('/api/reservas');
+            const reservas = await response.json();
+
+            document.getElementById('totalReservas').textContent = reservas.length;
+            document.getElementById('reservasPendientes').textContent = reservas.filter(r => r.estado === 'pendiente').length;
+            document.getElementById('reservasConfirmadas').textContent = reservas.filter(r => r.estado === 'confirmada').length;
+            document.getElementById('reservasCanceladas').textContent = reservas.filter(r => r.estado === 'cancelada').length;
+            document.querySelector('.table-badge').textContent = reservas.length + ' total';
+
+            const tbody = document.getElementById('tablaReservas');
+            if (reservas.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <p>No hay reservas registradas</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = reservas.map(r => `
+                    <tr data-id="${r.id}" data-estado="${r.estado}">
+                        <td>
+                            <div class="client-cell">
+                                <div class="client-avatar">${r.nombre.charAt(0)}</div>
+                                <div class="client-info">
+                                    <span class="client-name">${r.nombre}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="phone-cell">📞 ${r.telefono}</span></td>
+                        <td>
+                            <div class="date-cell">
+                                <span class="date-day">${r.fecha.split('-')[2]}</span>
+                                <span class="date-month">${r.fecha.split('-')[1]}/${r.fecha.split('-')[0]}</span>
+                            </div>
+                        </td>
+                        <td><span class="time-cell">🕐 ${r.hora}</span></td>
+                        <td><span class="people-cell">${r.personas} 👤</span></td>
+                        <td><span class="status-badge status-${r.estado}">${r.estado}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn action-confirm" data-id="${r.id}" title="Confirmar">✓</button>
+                                <button class="action-btn action-cancel" data-id="${r.id}" title="Cancelar">✕</button>
+                                <button class="action-btn action-delete" data-id="${r.id}" title="Eliminar">🗑</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            document.querySelector('.table-badge').textContent = reservas.length + ' total';
+
+        } catch (err) {
+            console.error('Error al actualizar:', err);
+        }
+    }
+
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.action-btn');
+        if (!btn) return;
+
+        const id = btn.dataset.id;
+
+        if (btn.classList.contains('action-confirm')) {
+            await fetch(`/api/reservas/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ estado: 'confirmada' })
+            });
+        } else if (btn.classList.contains('action-cancel')) {
+            await fetch(`/api/reservas/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ estado: 'cancelada' })
+            });
+        } else if (btn.classList.contains('action-delete')) {
+            if (confirm('¿Eliminar esta reserva?')) {
+                await fetch(`/api/reservas/${id}`, { method: 'DELETE' });
+            }
+        }
+        actualizarReservas();
+    });
+});
+</script>
+
+<%- include('partials/footer') %>

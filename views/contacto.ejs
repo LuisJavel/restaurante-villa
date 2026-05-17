@@ -1,0 +1,260 @@
+<%- include('partials/header') %>
+
+<main>
+    <section class="hero-page" style="--hero-bg: url('https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=1920&q=80');">
+        <div class="hero-page-overlay"></div>
+        <div class="hero-page-content">
+            <h1>Contacto</h1>
+            <p>Estamos aquí para ayudarte</p>
+        </div>
+    </section>
+
+    <section class="seccion">
+        <div class="contacto-container">
+            <div class="contacto-cards">
+                <div class="contacto-card">
+                    <div class="contacto-card-icon">📍</div>
+                    <h3>Ubicación</h3>
+                    <p>Calle Gourmet 123, Centro Histórico</p>
+                    <p>Ciudad, 28001</p>
+                </div>
+                <div class="contacto-card">
+                    <div class="contacto-card-icon">🕐</div>
+                    <h3>Horario</h3>
+                    <p>Martes - Sábado: 19:00 - 23:00</p>
+                    <p>Domingo: 13:00 - 22:00</p>
+                    <p class="cerrado">Lunes: Cerrado</p>
+                </div>
+                <div class="contacto-card">
+                    <div class="contacto-card-icon">📞</div>
+                    <h3>Contacto</h3>
+                    <p>Teléfono: (555) 123-4567</p>
+                    <p>Email: reservas@lechateau.com</p>
+                </div>
+            </div>
+
+            <div class="contacto-form-wrapper">
+                <div class="contacto-form-card">
+                    <h3>Envíanos un mensaje</h3>
+                    <form class="formulario">
+                        <div class="form-grupo">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" placeholder="Tu nombre" required>
+                        </div>
+                        <div class="form-grupo">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="tu@email.com" required>
+                        </div>
+                        <div class="form-grupo">
+                            <label for="asunto">Asunto</label>
+                            <select id="asunto">
+                                <option value="reserva">Reserva especial</option>
+                                <option value="evento">Evento privado</option>
+                                <option value="general">Consulta general</option>
+                                <option value="feedback">Feedback</option>
+                            </select>
+                        </div>
+                        <div class="form-grupo">
+                            <label for="mensaje">Mensaje</label>
+                            <textarea id="mensaje" rows="5" placeholder="¿En qué podemos ayudarte?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Enviar Mensaje</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="mapa-placeholder">
+            <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80" alt="Ubicación del restaurante">
+        </div>
+    </section>
+</main>
+
+<style>
+.hero-mini {
+    position: relative;
+    height: 35vh;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+}
+
+.hero-mini-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #312e81 100%);
+}
+
+.hero-mini-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80') center/cover;
+    opacity: 0.25;
+}
+
+.hero-mini-content {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+}
+
+.hero-mini-content h1 {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-mini-content p {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+}
+
+.contacto-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.contacto-cards {
+    display: contents;
+}
+
+.contacto-card {
+    background: var(--color-card);
+    border-radius: var(--radius);
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid var(--color-border);
+    transition: all 0.3s;
+}
+
+.contacto-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.contacto-card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.contacto-card h3 {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.contacto-card p {
+    color: var(--color-text-light);
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+}
+
+.cerrado {
+    color: var(--color-danger) !important;
+    font-weight: 500;
+}
+
+.contacto-form-wrapper {
+    grid-column: 1 / -1;
+}
+
+.contacto-form-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--color-card);
+    border-radius: var(--radius);
+    padding: 2rem;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+}
+
+.contacto-form-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-grupo label {
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-grupo input,
+.form-grupo select,
+.form-grupo textarea {
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: var(--color-bg);
+}
+
+.form-grupo textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-grupo input:focus,
+.form-grupo select:focus,
+.form-grupo textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    background: white;
+    box-shadow: 0 0 0 4px var(--color-accent-light);
+}
+
+.btn-block {
+    width: 100%;
+    justify-content: center;
+}
+
+.mapa-placeholder {
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    height: 350px;
+}
+
+.mapa-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (max-width: 900px) {
+    .contacto-container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<%- include('partials/footer') %>

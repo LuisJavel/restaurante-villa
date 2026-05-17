@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Menú - Le Château</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .admin-container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--color-border); flex-wrap: wrap; gap: 1rem; }
+        .admin-title { font-family: var(--font-heading); font-size: 2rem; font-weight: 600; color: var(--color-primary); }
+        .btn-add { background: var(--color-accent); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+        .btn-add:hover { background: var(--color-accent-hover); }
+        .btn-add-secondary { background: var(--color-bg); color: var(--color-text); border: 1px solid var(--color-border); }
+        .btn-add-secondary:hover { background: #e2e8f0; }
+        .stats-price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-price-card { background: var(--color-card); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--color-border); text-align: center; }
+        .stat-price-value { font-family: var(--font-heading); font-size: 2rem; font-weight: 700; color: var(--color-primary); }
+        .stat-price-label { font-size: 0.85rem; color: var(--color-text-light); margin-top: 0.25rem; }
+        .stat-price-card.highlight { background: linear-gradient(135deg, var(--color-accent), #a78bfa); }
+        .stat-price-card.highlight .stat-price-value { color: white; }
+        .stat-price-card.highlight .stat-price-label { color: rgba(255,255,255,0.8); }
+        .section-title { font-family: var(--font-heading); font-size: 1.5rem; color: var(--color-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .tabs-container { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--color-border); padding-bottom: 0.5rem; }
+        .tab-btn { padding: 0.75rem 1.5rem; border: none; background: none; cursor: pointer; font-size: 1rem; font-weight: 500; color: var(--color-text-light); border-radius: var(--radius-sm) var(--radius-sm) 0 0; transition: all 0.2s; }
+        .tab-btn:hover { color: var(--color-primary); background: var(--color-bg); }
+        .tab-btn.active { color: var(--color-accent); background: var(--color-accent-light); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .menu-grid-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+        .menu-card-admin { background: var(--color-card); border-radius: var(--radius); border: 1px solid var(--color-border); overflow: hidden; transition: all 0.3s; }
+        .menu-card-admin:hover { box-shadow: var(--shadow-xl); transform: translateY(-4px); }
+        .menu-card-admin img { width: 100%; height: 200px; object-fit: cover; }
+        .menu-card-body { padding: 1.5rem; }
+        .menu-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .menu-card-cat { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-accent); font-weight: 600; background: var(--color-accent-light); padding: 0.25rem 0.75rem; border-radius: 20px; }
+        .menu-card-title { font-family: var(--font-heading); font-size: 1.25rem; color: var(--color-primary); margin-bottom: 0.5rem; }
+        .menu-card-desc { color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.6; }
+        .menu-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--color-border); }
+        .menu-card-precio { font-family: var(--font-heading); font-size: 1.5rem; color: var(--color-accent); font-weight: 600; }
+        .menu-card-actions { display: flex; gap: 0.5rem; }
+        .btn-edit, .btn-delete-admin { width: 36px; height: 36px; border: none; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s; }
+        .btn-edit { background: #dcfce7; color: #166534; }
+        .btn-edit:hover { background: #22c55e; color: white; }
+        .btn-delete-admin { background: #fee2e2; color: #991b1b; }
+        .btn-delete-admin:hover { background: #ef4444; color: white; }
+        .cupones-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+        .cupon-card { background: var(--color-card); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--color-border); position: relative; overflow: hidden; }
+        .cupon-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .cupon-card.porcentaje::before { background: linear-gradient(90deg, var(--color-accent), #a78bfa); }
+        .cupon-card.euros::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .cupon-card.inactive { opacity: 0.5; }
+        .cupon-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .cupon-codigo { font-family: monospace; font-size: 1.25rem; font-weight: 700; color: var(--color-primary); background: var(--color-bg); padding: 0.5rem 1rem; border-radius: var(--radius-sm); }
+        .cupon-descuento { font-family: var(--font-heading); font-size: 1.75rem; font-weight: 700; color: var(--color-accent); }
+        .cupon-descripcion { color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 1rem; }
+        .cupon-estado { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .cupon-estado.activo { background: #dcfce7; color: #166534; }
+        .cupon-estado.inactivo { background: #fee2e2; color: #991b1b; }
+        .cupon-actions { display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--color-border); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--color-card); border-radius: var(--radius); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-family: var(--font-heading); font-size: 1.5rem; color: var(--color-primary); }
+        .modal-close { width: 36px; height: 36px; border: none; background: var(--color-bg); border-radius: var(--radius-sm); cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--color-danger); color: white; }
+        .modal-body { padding: 1.5rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--color-text); font-weight: 500; font-size: 0.9rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.875rem 1rem; border: 2px solid var(--color-border); border-radius: var(--radius-sm); font-size: 1rem; font-family: inherit; transition: all 0.2s; background: var(--color-bg); }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--color-accent); background: white; box-shadow: 0 0 0 4px var(--color-accent-light); }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .image-preview { width: 100%; height: 150px; object-fit: cover; border-radius: var(--radius-sm); margin-top: 0.75rem; display: none; }
+        .image-upload-toggle { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .toggle-btn { flex: 1; padding: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.2s; }
+        .toggle-btn.active { background: var(--color-accent); color: white; border-color: var(--color-accent); }
+        .modal-footer { padding: 1.5rem; border-top: 1px solid var(--color-border); display: flex; gap: 1rem; justify-content: flex-end; }
+        .btn-modal { padding: 0.75rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+        .btn-cancel { background: var(--color-bg); color: var(--color-text); }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-save { background: var(--color-accent); color: white; }
+        .btn-save:hover { background: var(--color-accent-hover); }
+        .btn-toggle { padding: 0.5rem 1rem; border: 1px solid var(--color-border); background: var(--color-bg); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+        .btn-toggle:hover { background: #e2e8f0; }
+        .btn-toggle.active { background: var(--color-success); color: white; border-color: var(--color-success); }
+        @media (max-width: 768px) { .admin-header { flex-direction: column; gap: 1rem; align-items: flex-start; } .menu-grid-admin { grid-template-columns: 1fr; } .cupones-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Le Château</a>
+            <ul class="nav-menu">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/menu">Menú</a></li>
+                <li><a href="/admin">Reservas</a></li>
+                <li><a href="/admin/menu" class="active btn-admin">Menú Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main style="margin-top: 72px; padding-bottom: 3rem;">
+        <div class="admin-container">
+            <div class="admin-header">
+                <div>
+                    <h1 class="admin-title">Gestión del Menú y Cupones</h1>
+                    <p style="color: var(--color-text-light);">Administra los platos y descuentos del restaurante</p>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <a href="/admin" class="btn-add btn-add-secondary">← Volver</a>
+                    <a href="/logout" class="btn-add btn-add-secondary" style="background: #fee2e2; color: #991b1b; border-color: #fee2e2;">🚪 Cerrar Sesión</a>
+                </div>
+            </div>
+
+            <div class="stats-price-grid">
+                <div class="stat-price-card">
+                    <div class="stat-price-value" id="totalItems">0</div>
+                    <div class="stat-price-label">Total Platos</div>
+                </div>
+                <div class="stat-price-card highlight">
+                    <div class="stat-price-value" id="totalValor">€0</div>
+                    <div class="stat-price-label">Valor Total Menú</div>
+                </div>
+                <div class="stat-price-card">
+                    <div class="stat-price-value" id="precioPromedio">€0</div>
+                    <div class="stat-price-label">Precio Promedio</div>
+                </div>
+                <div class="stat-price-card">
+                    <div class="stat-price-value" id="totalCupones">0</div>
+                    <div class="stat-price-label">Cupones Activos</div>
+                </div>
+            </div>
+
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('menu')">🍽️ Platos del Menú</button>
+                <button class="tab-btn" onclick="switchTab('cupones')">🎫 Cupones de Descuento</button>
+            </div>
+
+            <div id="tabMenu" class="tab-content active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 class="section-title">Platos</h2>
+                    <button class="btn-add" onclick="openModal()">+ Agregar Plato</button>
+                </div>
+                <div class="menu-grid-admin" id="menuGrid"></div>
+            </div>
+
+            <div id="tabCupones" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 class="section-title">Cupones de Descuento</h2>
+                    <button class="btn-add" onclick="openCuponModal()">+ Agregar Cupón</button>
+                </div>
+                <div class="cupones-grid" id="cuponesGrid"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Agregar Plato</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="menuForm">
+                    <input type="hidden" id="itemId">
+                    <div class="form-group">
+                        <label for="nombre">Nombre del plato</label>
+                        <input type="text" id="nombre" required placeholder="Ej: Risotto de Hongos">
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" required placeholder="Describe el plato..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="precio">Precio (€)</label>
+                        <input type="number" id="precio" required min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" required>
+                            <option value="entradas">Entradas</option>
+                            <option value="principales">Platos Principales</option>
+                            <option value="postres">Postres</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="imagen">Imagen</label>
+                        <div class="image-upload-toggle">
+                            <button type="button" class="toggle-btn active" onclick="toggleImageInput('url')">URL</button>
+                            <button type="button" class="toggle-btn" onclick="toggleImageInput('file')">Subir archivo</button>
+                        </div>
+                        <input type="url" id="imagenUrl" placeholder="https://..." onchange="previewImageUrl(this)" style="display: block;">
+                        <input type="file" id="imagenFile" accept="image/*" onchange="previewImageFile(this)" style="display: none;">
+                        <img id="imagePreview" class="image-preview" alt="Preview">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="btn-modal btn-save" onclick="saveItem()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cuponModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="cuponModalTitle">Agregar Cupón</h2>
+                <button class="modal-close" onclick="closeCuponModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="cuponForm">
+                    <input type="hidden" id="cuponId">
+                    <div class="form-group">
+                        <label for="codigo">Código del cupón</label>
+                        <input type="text" id="codigo" required placeholder="Ej: VIP20" style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label for="cuponDescripcion">Descripción</label>
+                        <input type="text" id="cuponDescripcion" required placeholder="Ej: 20% de descuento - Miembro VIP">
+                    </div>
+                    <div class="form-group">
+                        <label for="descuento">Descuento</label>
+                        <input type="number" id="descuento" required min="1" placeholder="Ej: 20">
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoDescuento">Tipo de descuento</label>
+                        <select id="tipoDescuento" required>
+                            <option value="porcentaje">Porcentaje (%)</option>
+                            <option value="euros">Euros (€)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-cancel" onclick="closeCuponModal()">Cancelar</button>
+                <button class="btn-modal btn-save" onclick="saveCupon()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="imageModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="imageModalTitle">Vista de Imagen</h2>
+                <button class="modal-close" onclick="closeImageModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <img id="expandedImage" src="" alt="Imagen ampliada" style="width: 100%; max-height: 70vh; object-fit: contain; border-radius: 0 0 var(--radius) var(--radius);">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let menuItems = <%- JSON.stringify(menuItems) %>;
+        let cupones = <%- JSON.stringify(cupones) %>;
+        let editingId = null;
+        let editingCuponId = null;
+
+        function updateStats() {
+            const totalItems = menuItems.length;
+            const totalValor = menuItems.reduce((sum, item) => sum + item.precio, 0);
+            const precioPromedio = totalItems > 0 ? (totalValor / totalItems).toFixed(2) : 0;
+            const cuponesActivos = cupones.filter(c => c.activo).length;
+
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('totalValor').textContent = '€' + totalValor.toFixed(2);
+            document.getElementById('precioPromedio').textContent = '€' + precioPromedio;
+            document.getElementById('totalCupones').textContent = cuponesActivos;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            if (tab === 'menu') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('tabMenu').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('tabCupones').classList.add('active');
+            }
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('menuGrid');
+            const categorias = { entradas: '🥂 Entradas', principales: '🍽️ Principales', postres: '🍰 Postres' };
+
+            if (menuItems.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: var(--color-text-light); grid-column: 1/-1; padding: 3rem;">No hay platos en el menú</p>';
+                return;
+            }
+
+            grid.innerHTML = menuItems.map(item => `
+                <div class="menu-card-admin">
+                    <img src="${item.imagen}" alt="${item.nombre}" onclick="expandImage('${item.imagen}', '${item.nombre}')" style="cursor: zoom-in;">
+                    <div class="menu-card-body">
+                        <div class="menu-card-header">
+                            <span class="menu-card-cat">${categorias[item.categoria] || item.categoria}</span>
+                        </div>
+                        <h3 class="menu-card-title">${item.nombre}</h3>
+                        <p class="menu-card-desc">${item.descripcion}</p>
+                        <div class="menu-card-footer">
+                            <span class="menu-card-precio">€${item.precio}</span>
+                            <div class="menu-card-actions">
+                                <button class="btn-edit" onclick="editItem(${item.id})" title="Editar">✎</button>
+                                <button class="btn-delete-admin" onclick="deleteItem(${item.id})" title="Eliminar">🗑</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            updateStats();
+        }
+
+        function renderCupones() {
+            const grid = document.getElementById('cuponesGrid');
+
+            if (cupones.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: var(--color-text-light); grid-column: 1/-1; padding: 3rem;">No hay cupones registrados</p>';
+                return;
+            }
+
+            grid.innerHTML = cupones.map(cupon => `
+                <div class="cupon-card ${cupon.tipo} ${!cupon.activo ? 'inactive' : ''}">
+                    <div class="cupon-header">
+                        <span class="cupon-codigo">${cupon.codigo}</span>
+                        <span class="cupon-descuento">${cupon.tipo === 'porcentaje' ? cupon.descuento + '%' : '€' + cupon.descuento}</span>
+                    </div>
+                    <p class="cupon-descripcion">${cupon.descripcion}</p>
+                    <span class="cupon-estado ${cupon.activo ? 'activo' : 'inactivo'}">${cupon.activo ? 'Activo' : 'Inactivo'}</span>
+                    <div class="cupon-actions">
+                        <button class="btn-edit" onclick="editCupon(${cupon.id})" title="Editar">✎</button>
+                        <button class="${cupon.activo ? 'btn-toggle' : 'btn-toggle active'}" onclick="toggleCupon(${cupon.id})">
+                            ${cupon.activo ? 'Desactivar' : 'Activar'}
+                        </button>
+                        <button class="btn-delete-admin" onclick="deleteCupon(${cupon.id})" title="Eliminar">🗑</button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateStats();
+        }
+
+        function toggleImageInput(type) {
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            if (type === 'url') {
+                document.getElementById('imagenUrl').style.display = 'block';
+                document.getElementById('imagenFile').style.display = 'none';
+                document.querySelector('.toggle-btn:nth-child(1)').classList.add('active');
+            } else {
+                document.getElementById('imagenUrl').style.display = 'none';
+                document.getElementById('imagenFile').style.display = 'block';
+                document.querySelector('.toggle-btn:nth-child(2)').classList.add('active');
+            }
+        }
+
+        function previewImageUrl(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.value) {
+                preview.src = input.value;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function previewImageFile(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function openModal(item = null) {
+            editingId = item ? item.id : null;
+            document.getElementById('modalTitle').textContent = item ? 'Editar Plato' : 'Agregar Plato';
+            document.getElementById('itemId').value = item ? item.id : '';
+            document.getElementById('nombre').value = item ? item.nombre : '';
+            document.getElementById('descripcion').value = item ? item.descripcion : '';
+            document.getElementById('precio').value = item ? item.precio : '';
+            document.getElementById('categoria').value = item ? item.categoria : 'entradas';
+            toggleImageInput('url');
+            document.getElementById('imagenUrl').value = item ? item.imagen : '';
+            document.getElementById('imagenFile').value = '';
+            document.getElementById('imagePreview').style.display = item && item.imagen ? 'block' : 'none';
+            if (item && item.imagen) {
+                document.getElementById('imagePreview').src = item.imagen;
+            }
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            editingId = null;
+        }
+
+        function openCuponModal(cupon = null) {
+            editingCuponId = cupon ? cupon.id : null;
+            document.getElementById('cuponModalTitle').textContent = cupon ? 'Editar Cupón' : 'Agregar Cupón';
+            document.getElementById('cuponId').value = cupon ? cupon.id : '';
+            document.getElementById('codigo').value = cupon ? cupon.codigo : '';
+            document.getElementById('cuponDescripcion').value = cupon ? cupon.descripcion : '';
+            document.getElementById('descuento').value = cupon ? cupon.descuento : '';
+            document.getElementById('tipoDescuento').value = cupon ? cupon.tipo : 'porcentaje';
+            document.getElementById('cuponModalOverlay').classList.add('active');
+        }
+
+        function closeCuponModal() {
+            document.getElementById('cuponModalOverlay').classList.remove('active');
+            editingCuponId = null;
+        }
+
+        function expandImage(url, nombre) {
+            document.getElementById('expandedImage').src = url;
+            document.getElementById('imageModalTitle').textContent = nombre;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        function editItem(id) {
+            const item = menuItems.find(m => m.id === id);
+            if (item) openModal(item);
+        }
+
+        async function saveItem() {
+            const formData = new FormData();
+            formData.append('nombre', document.getElementById('nombre').value);
+            formData.append('descripcion', document.getElementById('descripcion').value);
+            formData.append('precio', document.getElementById('precio').value);
+            formData.append('categoria', document.getElementById('categoria').value);
+
+            const imagenUrl = document.getElementById('imagenUrl').value;
+            const imagenFile = document.getElementById('imagenFile').files[0];
+
+            if (imagenFile) {
+                formData.append('imagen', imagenFile);
+            } else if (imagenUrl) {
+                formData.append('imagenUrl', imagenUrl);
+            }
+
+            try {
+                let res;
+                if (editingId) {
+                    res = await fetch(`/api/menu/${editingId}`, { method: 'PUT', body: formData });
+                } else {
+                    res = await fetch('/api/menu', { method: 'POST', body: formData });
+                }
+
+                const result = await res.json();
+                if (result.success) {
+                    closeModal();
+                    await loadMenu();
+                }
+            } catch (err) {
+                alert('Error al guardar');
+            }
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('¿Eliminar este plato?')) return;
+            try {
+                await fetch(`/api/menu/${id}`, { method: 'DELETE' });
+                await loadMenu();
+            } catch (err) {
+                alert('Error al eliminar');
+            }
+        }
+
+        async function loadMenu() {
+            const res = await fetch('/api/menu');
+            menuItems = await res.json();
+            renderMenu();
+        }
+
+        function editCupon(id) {
+            const cupon = cupones.find(c => c.id === id);
+            if (cupon) openCuponModal(cupon);
+        }
+
+        async function saveCupon() {
+            const data = {
+                codigo: document.getElementById('codigo').value,
+                descripcion: document.getElementById('cuponDescripcion').value,
+                descuento: document.getElementById('descuento').value,
+                tipo: document.getElementById('tipoDescuento').value
+            };
+
+            try {
+                let res;
+                if (editingCuponId) {
+                    res = await fetch(`/api/cupones/${editingCuponId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    res = await fetch('/api/cupones', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                const result = await res.json();
+                if (result.success) {
+                    closeCuponModal();
+                    await loadCupones();
+                }
+            } catch (err) {
+                alert('Error al guardar');
+            }
+        }
+
+        async function toggleCupon(id) {
+            const cupon = cupones.find(c => c.id === id);
+            if (!cupon) return;
+
+            try {
+                await fetch(`/api/cupones/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ activo: !cupon.activo })
+                });
+                await loadCupones();
+            } catch (err) {
+                alert('Error al actualizar');
+            }
+        }
+
+        async function deleteCupon(id) {
+            if (!confirm('¿Eliminar este cupón?')) return;
+            try {
+                await fetch(`/api/cupones/${id}`, { method: 'DELETE' });
+                await loadCupones();
+            } catch (err) {
+                alert('Error al eliminar');
+            }
+        }
+
+        async function loadCupones() {
+            const res = await fetch('/api/cupones');
+            cupones = await res.json();
+            renderCupones();
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modalOverlay') closeModal();
+        });
+
+        document.getElementById('cuponModalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'cuponModalOverlay') closeCuponModal();
+        });
+
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target.id === 'imageModal') closeImageModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeCuponModal();
+                closeImageModal();
+            }
+        });
+
+        renderMenu();
+        renderCupones();
+    </script>
+</body>
+</html>

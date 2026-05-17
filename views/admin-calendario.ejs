@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario - Le Château</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--color-border); flex-wrap: wrap; gap: 1rem; }
+        .admin-title { font-family: var(--font-heading); font-size: 2rem; font-weight: 600; color: var(--color-primary); }
+        .btn-add { background: var(--color-accent); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+        .btn-add:hover { background: var(--color-accent-hover); }
+        .btn-add-secondary { background: var(--color-bg); color: var(--color-text); border: 1px solid var(--color-border); text-decoration: none; padding: 0.75rem 1.5rem; border-radius: var(--radius-sm); font-weight: 500; }
+        .btn-add-secondary:hover { background: #e2e8f0; }
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .calendar-month { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600; color: var(--color-primary); }
+        .calendar-nav-btns { display: flex; gap: 0.5rem; }
+        .calendar-nav-btn { padding: 0.5rem 1rem; border: 1px solid var(--color-border); background: var(--color-card); border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .calendar-nav-btn:hover { background: var(--color-bg); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; background: var(--color-card); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--color-border); }
+        .calendar-day-header { text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--color-text-light); padding: 0.5rem; text-transform: uppercase; }
+        .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; font-size: 0.9rem; position: relative; border: 2px solid transparent; }
+        .calendar-day:hover:not(.empty):not(.other-month) { background: var(--color-bg); }
+        .calendar-day.other-month { opacity: 0.3; }
+        .calendar-day.empty { cursor: default; }
+        .calendar-day.today { border-color: var(--color-accent); font-weight: 600; }
+        .calendar-day.cerrado { background: #fee2e2; color: #991b1b; }
+        .calendar-day.cerrado:hover { background: #fecaca; }
+        .calendar-day.evento { background: #fef3c7; color: #92400e; }
+        .calendar-day.evento:hover { background: #fde68a; }
+        .calendar-day.has-reservas::after { content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--color-accent); border-radius: 50%; }
+        .day-indicator { font-size: 0.7rem; text-align: center; margin-top: 2px; }
+        .legend { display: flex; gap: 1.5rem; margin-top: 1.5rem; justify-content: center; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
+        .legend-dot { width: 16px; height: 16px; border-radius: 4px; }
+        .legend-dot.cerrado { background: #fee2e2; border: 2px solid #991b1b; }
+        .legend-dot.evento { background: #fef3c7; border: 2px solid #92400e; }
+        .legend-dot.reserva { background: var(--color-accent-light); border: 2px solid var(--color-accent); }
+        .special-days-section { margin-top: 2rem; }
+        .section-title { font-family: var(--font-heading); font-size: 1.5rem; color: var(--color-primary); margin-bottom: 1rem; }
+        .special-days-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+        .special-day-card { background: var(--color-card); border-radius: var(--radius); padding: 1.25rem; border: 1px solid var(--color-border); position: relative; overflow: hidden; }
+        .special-day-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .special-day-card.cerrado::before { background: #ef4444; }
+        .special-day-card.evento::before { background: #f59e0b; }
+        .special-day-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .special-day-fecha { font-family: monospace; font-size: 0.9rem; background: var(--color-bg); padding: 0.25rem 0.5rem; border-radius: 4px; }
+        .special-day-tipo { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+        .special-day-tipo.cerrado { background: #fee2e2; color: #991b1b; }
+        .special-day-tipo.evento { background: #fef3c7; color: #92400e; }
+        .special-day-titulo { font-weight: 600; color: var(--color-primary); margin-bottom: 0.25rem; }
+        .special-day-desc { font-size: 0.85rem; color: var(--color-text-light); }
+        .special-day-actions { display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--color-border); }
+        .btn-edit, .btn-delete { padding: 0.4rem 0.75rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s; }
+        .btn-edit { background: #dcfce7; color: #166534; }
+        .btn-edit:hover { background: #22c55e; color: white; }
+        .btn-delete { background: #fee2e2; color: #991b1b; }
+        .btn-delete:hover { background: #ef4444; color: white; }
+        .btn-toggle { padding: 0.4rem 0.75rem; border: 1px solid var(--color-border); border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; background: var(--color-bg); }
+        .btn-toggle:hover { background: #e2e8f0; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--color-card); border-radius: var(--radius); width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-family: var(--font-heading); font-size: 1.5rem; color: var(--color-primary); }
+        .modal-close { width: 36px; height: 36px; border: none; background: var(--color-bg); border-radius: var(--radius-sm); cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--color-danger); color: white; }
+        .modal-body { padding: 1.5rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--color-text); font-weight: 500; font-size: 0.9rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.875rem 1rem; border: 2px solid var(--color-border); border-radius: var(--radius-sm); font-size: 1rem; font-family: inherit; transition: all 0.2s; background: var(--color-bg); }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--color-accent); background: white; box-shadow: 0 0 0 4px var(--color-accent-light); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-group-checkbox { display: flex; align-items: center; gap: 0.75rem; }
+        .form-group-checkbox input { width: auto; }
+        .modal-footer { padding: 1.5rem; border-top: 1px solid var(--color-border); display: flex; gap: 1rem; justify-content: flex-end; }
+        .btn-modal { padding: 0.75rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+        .btn-cancel { background: var(--color-bg); color: var(--color-text); }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-save { background: var(--color-accent); color: white; }
+        .btn-save:hover { background: var(--color-accent-hover); }
+        .admin-nav { display: flex; gap: 0.5rem; }
+        .admin-nav a { padding: 0.75rem 1.25rem; border-radius: var(--radius-sm); font-weight: 500; text-decoration: none; transition: all 0.2s; }
+        .admin-nav a:not(.active) { background: var(--color-card); color: var(--color-text); border: 1px solid var(--color-border); }
+        .admin-nav a:not(.active):hover { background: var(--color-bg); }
+        .admin-nav a.active { background: var(--color-accent); color: white; }
+        @media (max-width: 768px) { .calendar-grid { padding: 0.75rem; gap: 0.25rem; } .calendar-day { font-size: 0.8rem; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Le Villa</a>
+            <ul class="nav-menu">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/menu">Menú</a></li>
+                <li><a href="/admin">Reservas</a></li>
+                <li><a href="/admin/menu">Menú</a></li>
+                <li><a href="/admin/calendario" class="active btn-admin">Calendario</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main style="margin-top: 72px; padding-bottom: 3rem;">
+        <div class="admin-container">
+            <div class="admin-header">
+                <div>
+                    <h1 class="admin-title">Calendario y Días Especiales</h1>
+                    <p style="color: var(--color-text-light);">Gestiona días cerrados y eventos especiales</p>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="/admin" class="btn-add-secondary">← Volver</a>
+                    <a href="/logout" class="btn-add-secondary" style="background: #fee2e2; color: #991b1b; border-color: #fee2e2;">🚪 Cerrar Sesión</a>
+                </div>
+            </div>
+
+            <div class="admin-nav" style="margin-bottom: 1.5rem;">
+                <a href="/admin">Gestionar Reservas</a>
+                <a href="/admin/calendario" class="active">Calendario</a>
+                <a href="/admin/menu">Menú</a>
+            </div>
+
+            <div class="calendar-nav">
+                <button class="calendar-nav-btn" onclick="changeMonth(-1)">← Anterior</button>
+                <span class="calendar-month" id="currentMonth"></span>
+                <button class="calendar-nav-btn" onclick="changeMonth(1)">Siguiente →</button>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid"></div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot cerrado"></div> Día cerrado</div>
+                <div class="legend-item"><div class="legend-dot evento"></div> Evento especial</div>
+                <div class="legend-item"><div class="legend-dot reserva"></div> Tiene reservas</div>
+            </div>
+
+            <div class="special-days-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 class="section-title">Días Configurados</h2>
+                    <button class="btn-add" onclick="openModal()">+ Agregar Día Especial</button>
+                </div>
+                <div class="special-days-list" id="specialDaysList"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Agregar Día Especial</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="specialDayForm">
+                    <input type="hidden" id="diaId">
+                    <div class="form-group">
+                        <label for="fecha">Fecha</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo" required>
+                            <option value="evento">Evento Especial</option>
+                            <option value="cerrado">Día Cerrado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="titulo">Título</label>
+                        <input type="text" id="titulo" required placeholder="Ej: Noche de Navidad">
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" placeholder="Ej: Cena especial con menú fijo..."></textarea>
+                    </div>
+                    <div class="form-group form-group-checkbox">
+                        <input type="checkbox" id="cerrado" checked>
+                        <label for="cerrado">Restaurante cerrado (no se aceptan reservas)</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="btn-modal btn-save" onclick="saveDay()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let diasEspeciales = <%- JSON.stringify(diasEspeciales) %>;
+        let reservas = <%- JSON.stringify(reservas) %>;
+        let currentDate = new Date();
+        let editingId = null;
+
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            document.getElementById('currentMonth').textContent = `${meses[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay();
+            const daysInMonth = lastDay.getDate();
+
+            const prevMonth = new Date(year, month, 0);
+            const daysInPrevMonth = prevMonth.getDate();
+
+            let html = diasSemana.map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+
+            const today = new Date();
+            const todayStr = formatDate(today);
+
+            for (let i = startDay - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                html += `<div class="calendar-day other-month empty"><span>${day}</span></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const specialDay = diasEspeciales.find(d => d.fecha === dateStr);
+                const dayReservas = reservas.filter(r => r.fecha === dateStr && r.estado !== 'cancelada');
+                const isToday = dateStr === todayStr;
+
+                let classes = ['calendar-day'];
+                if (isToday) classes.push('today');
+                if (specialDay) {
+                    classes.push(specialDay.tipo);
+                    if (specialDay.cerrado) classes.push('cerrado');
+                }
+                if (dayReservas.length > 0) classes.push('has-reservas');
+
+                let indicator = '';
+                if (specialDay) {
+                    indicator = `<span class="day-indicator">${specialDay.cerrado ? '🔒' : '🎉'}</span>`;
+                }
+
+                html += `<div class="${classes.join(' ')}" onclick="openModalForDate('${dateStr}')">
+                    <span>${day}</span>
+                    ${indicator}
+                </div>`;
+            }
+
+            const remainingCells = 42 - (startDay + daysInMonth);
+            for (let i = 1; i <= remainingCells; i++) {
+                html += `<div class="calendar-day other-month empty"><span>${i}</span></div>`;
+            }
+
+            document.getElementById('calendarGrid').innerHTML = html;
+            renderSpecialDaysList();
+        }
+
+        function renderSpecialDaysList() {
+            const list = document.getElementById('specialDaysList');
+            const sortedDays = [...diasEspeciales].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+            if (sortedDays.length === 0) {
+                list.innerHTML = '<p style="color: var(--color-text-light); grid-column: 1/-1; text-align: center; padding: 2rem;">No hay días especiales configurados</p>';
+                return;
+            }
+
+            list.innerHTML = sortedDays.map(dia => `
+                <div class="special-day-card ${dia.tipo}">
+                    <div class="special-day-header">
+                        <span class="special-day-fecha">${dia.fecha}</span>
+                        <span class="special-day-tipo ${dia.tipo}">${dia.tipo === 'cerrado' ? 'Cerrado' : 'Evento'}</span>
+                    </div>
+                    <h4 class="special-day-titulo">${dia.titulo}</h4>
+                    <p class="special-day-desc">${dia.descripcion || 'Sin descripción'}</p>
+                    <div class="special-day-actions">
+                        <button class="btn-edit" onclick="editDay(${dia.id})">Editar</button>
+                        <button class="btn-toggle" onclick="toggleDay(${dia.id})">${dia.cerrado ? 'Abrir' : 'Cerrar'}</button>
+                        <button class="btn-delete" onclick="deleteDay(${dia.id})">Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function openModalForDate(date) {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Agregar Día Especial';
+            document.getElementById('diaId').value = '';
+            document.getElementById('fecha').value = date;
+            document.getElementById('titulo').value = '';
+            document.getElementById('descripcion').value = '';
+            document.getElementById('tipo').value = 'evento';
+            document.getElementById('cerrado').checked = true;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function openModal(dia = null) {
+            editingId = dia ? dia.id : null;
+            document.getElementById('modalTitle').textContent = dia ? 'Editar Día Especial' : 'Agregar Día Especial';
+            document.getElementById('diaId').value = dia ? dia.id : '';
+            document.getElementById('fecha').value = dia ? dia.fecha : '';
+            document.getElementById('titulo').value = dia ? dia.titulo : '';
+            document.getElementById('descripcion').value = dia ? dia.descripcion : '';
+            document.getElementById('tipo').value = dia ? dia.tipo : 'evento';
+            document.getElementById('cerrado').checked = dia ? dia.cerrado : true;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            editingId = null;
+        }
+
+        function editDay(id) {
+            const dia = diasEspeciales.find(d => d.id === id);
+            if (dia) openModal(dia);
+        }
+
+        async function saveDay() {
+            const data = {
+                fecha: document.getElementById('fecha').value,
+                tipo: document.getElementById('tipo').value,
+                titulo: document.getElementById('titulo').value,
+                descripcion: document.getElementById('descripcion').value,
+                cerrado: document.getElementById('cerrado').checked
+            };
+
+            try {
+                let res;
+                if (editingId) {
+                    res = await fetch(`/api/dias-especiales/${editingId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    res = await fetch('/api/dias-especiales', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                const result = await res.json();
+                if (result.success) {
+                    closeModal();
+                    await loadData();
+                } else {
+                    alert(result.error || 'Error al guardar');
+                }
+            } catch (err) {
+                alert('Error al guardar');
+            }
+        }
+
+        async function toggleDay(id) {
+            const dia = diasEspeciales.find(d => d.id === id);
+            if (!dia) return;
+
+            try {
+                await fetch(`/api/dias-especiales/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cerrado: !dia.cerrado })
+                });
+                await loadData();
+            } catch (err) {
+                alert('Error al actualizar');
+            }
+        }
+
+        async function deleteDay(id) {
+            if (!confirm('¿Eliminar este día especial?')) return;
+            try {
+                await fetch(`/api/dias-especiales/${id}`, { method: 'DELETE' });
+                await loadData();
+            } catch (err) {
+                alert('Error al eliminar');
+            }
+        }
+
+        async function loadData() {
+            const [diasRes, reservasRes] = await Promise.all([
+                fetch('/api/dias-especiales'),
+                fetch('/api/reservas')
+            ]);
+            diasEspeciales = await diasRes.json();
+            reservas = await reservasRes.json();
+            renderCalendar();
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modalOverlay') closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        renderCalendar();
+    </script>
+</body>
+</html>
