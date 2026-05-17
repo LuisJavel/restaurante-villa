@@ -1,12 +1,12 @@
 {
-  "name": "taller-node",
+  "name": "restaurante-villa",
   "version": "1.0.0",
-  "description": "Le Château - Restaurante Gourmet con Express",
-  "main": "index.js",
+  "description": "Le Château - Restaurante Gourmet",
+  "main": "api/index.js",
   "scripts": {
-    "dev": "nodemon ./index.js",
-    "start": "node ./index.js",
-    "build": "echo 'No build needed for Node.js'"
+    "dev": "nodemon ./api/index.js",
+    "start": "node ./api/index.js",
+    "build": "echo 'No build needed'"
   },
   "author": "Javier Masaquiza",
   "license": "ISC",
@@ -17,11 +17,7 @@
     "multer": "^2.1.1"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.7.0",
-    "nodemon": "^3.1.14",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "nodemon": "^3.1.14"
   },
   "engines": {
     "node": ">=18.0.0"
